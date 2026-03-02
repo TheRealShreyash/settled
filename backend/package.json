@@ -1,0 +1,11 @@
+{
+  "name": "settled-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.2.3"
+  }
+}
