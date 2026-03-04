@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import type { Property } from "../../types/property";
 import { Hero, Header, PropertyGrid, ComparisonDrawer } from "components";
+import { INDIAN_STATES } from "constants/locations";
+import type { SearchFilters } from "components/Hero";
 
 function App() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -11,53 +13,72 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const [availableStates, setAvailableStates] = useState<string[]>([]);
-  const [availableCities, setAvailableCities] = useState<string[]>([]);
 
   useEffect(() => {
+    setAvailableStates(INDIAN_STATES);
     fetchProperties();
   }, []);
 
-  useEffect(() => {
-    if (comparingIds.size >= 2) {
-      setShowComparison(true);
-    } else {
-      setShowComparison(false);
+  // useEffect(() => {
+  //   if (comparingIds.size >= 2) {
+  //     setShowComparison(true);
+  //   } else {
+  //     setShowComparison(false);
+  //   }
+  // }, [comparingIds]);
+
+  async function fetchProperties(filters?: SearchFilters) {
+    try {
+      setLoading(true);
+
+      let url = `${import.meta.env.VITE_BACKEND_URL}/listing/list`;
+
+      if (filters) {
+        const params = new URLSearchParams();
+
+        if (filters.state) params.append("state", filters.state.toLowerCase());
+        if (filters.city) params.append("city", filters.city.toLowerCase());
+        if (filters.priceRange) params.append("price", filters.priceRange[1].toString());
+        url += `?${params.toString()}`;
+      }
+
+      const res = await fetch(url);
+      const result = await res.json();
+
+      if (result.data && Array.isArray(result.data)) {
+        const cleanData = result.data.map((item: any) => ({
+          ...item,
+          id: item._id,
+        }));
+
+        setProperties(cleanData);
+        setFilteredProperties(cleanData);
+      }
+    } catch (error) {
+      console.error("Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [comparingIds]);
-
-  async function fetchProperties() {
-    setLoading(true);
-    const res = await fetch("http://localhost:8080/listing/list");
-
-    const data = await res.json();
-
-    console.log(data)
-
-    if (data) {
-      setProperties(data);
-    }
-
-    setLoading(false);
   }
 
-  // function handleSearch(filters: SearchFilters) {
-  //   let filtered = [...properties];
+  function handleSearch(filters: SearchFilters) {
+    // let filtered = [...properties];
 
-  //   if (filters.state) {
-  //     filtered = filtered.filter((p) => p.state === filters.state);
-  //   }
+    // if (filters.state) {
+    //   filtered = filtered.filter((p) => p.address.state === filters.state);
+    // }
 
-  //   if (filters.city) {
-  //     filtered = filtered.filter((p) => p.city === filters.city);
-  //   }
+    // if (filters.city) {
+    //   filtered = filtered.filter((p) => p.address.city === filters.city);
+    // }
 
-  //   filtered = filtered.filter(
-  //     (p) =>
-  //       p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1],
-  //   );
+    // filtered = filtered.filter(
+    //   (p) =>
+    //     p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1],
+    // );
 
-  //   setFilteredProperties(filtered);
-  // }
+    fetchProperties(filters);
+  }
 
   function handleShortlist(id: string) {
     setShortlistedIds((prev) => {
@@ -96,7 +117,7 @@ function App() {
     setFilteredProperties(shortlisted.length > 0 ? shortlisted : properties);
   }
 
-  const comparisonProperties = properties.filter((p) => comparingIds.has(p.id));
+  // const comparisonProperties = properties.filter((p) => comparingIds.has(p.id));
 
   return (
     <div className="min-h-screen bg-[#121212] font-['Inter',sans-serif]">
@@ -106,9 +127,9 @@ function App() {
       />
 
       <Hero
-        onSearch={() => console.log("Hello")}
+        onSearch={handleSearch}
         availableStates={availableStates}
-        availableCities={availableCities}
+        availableCities={[]}
       />
 
       <main className="max-w-7xl mx-auto px-6 pb-32">
@@ -120,21 +141,21 @@ function App() {
         ) : (
           <PropertyGrid
             properties={filteredProperties}
-            onShortlist={handleShortlist}
-            onCompare={handleCompare}
+            onShortlist={() => console.log("onCompare")}
+            onCompare={() => console.log("onCompare")}
             shortlistedIds={shortlistedIds}
             comparingIds={comparingIds}
           />
         )}
       </main>
 
-      {showComparison && (
+      {/* {showComparison && (
         <ComparisonDrawer
-          properties={comparisonProperties}
+          properties={[]}
           onClose={() => setComparingIds(new Set())}
           onRemove={handleRemoveFromComparison}
         />
-      )}
+      )} */}
     </div>
   );
 }

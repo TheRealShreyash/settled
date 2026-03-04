@@ -18,7 +18,7 @@ listing.get("/list", async (req, res) => {
     }
 
     const results = await Listing.find(filters);
-    res.status(200).json({ data: results, success: false });
+    res.status(200).json({ data: results, success: true });
   } catch (error) {
     res.status(500).json({ error: error, success: false });
   }

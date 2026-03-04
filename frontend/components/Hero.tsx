@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
+import { STATE_CITY_MAP } from "constants/locations";
 
 interface HeroProps {
   onSearch: (filters: SearchFilters) => void;
@@ -20,12 +21,17 @@ export default function Hero({
 }: HeroProps) {
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50_000]);
   const [filteredCities, setFilteredCities] = useState<string[]>([]);
 
   useEffect(() => {
-    setFilteredCities(availableCities);
-  }, [availableCities]);
+    if (selectedState) {
+      const cities = STATE_CITY_MAP[selectedState] || [];
+      setFilteredCities(cities);
+    } else {
+      setFilteredCities([]); // Reset if "All States" is picked
+    }
+  }, [selectedState]);
 
   const handleSearch = () => {
     onSearch({
@@ -92,13 +98,13 @@ export default function Hero({
 
             <div className="relative">
               <label className="block text-sm font-medium text-gray-400 mb-2 text-left">
-                Max Price: ${(priceRange[1] / 1000000).toFixed(1)}M
+                Max Price: ₹ {priceRange[1]}
               </label>
               <input
                 type="range"
                 min="0"
-                max="5000000"
-                step="100000"
+                max="50000"
+                step="500"
                 value={priceRange[1]}
                 onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
                 className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider mt-3"

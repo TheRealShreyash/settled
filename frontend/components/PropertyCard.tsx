@@ -23,7 +23,7 @@ export default function PropertyCard({
     <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/10">
       <div className="relative overflow-hidden aspect-4/3">
         <img
-          src={property.image_url}
+          src={property.images[0]}
           alt={property.title}
           className={`w-full h-full object-cover transition-all duration-500 ${
             imageLoaded ? "scale-100 opacity-100" : "scale-110 opacity-0"
@@ -59,30 +59,30 @@ export default function PropertyCard({
         <h3 className="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
           {property.title}
         </h3>
-        <p className="text-gray-400 text-sm mb-3">{property.address}</p>
+        <p className="text-gray-400 text-sm mb-3">{property.address.street}</p>
         <p className="text-gray-400 text-sm mb-4">
-          {property.city}, {property.state}
+          {property.address.city}, {property.address.state}
         </p>
 
         <div className="flex items-center gap-4 mb-4 text-gray-400 text-sm">
           <div className="flex items-center gap-1">
             <Bed size={16} />
-            <span>{property.bedrooms} beds</span>
+            <span>{property.bedrooms || 0} beds</span>
           </div>
           <div className="flex items-center gap-1">
             <Bath size={16} />
-            <span>{property.bathrooms} baths</span>
+            <span>{property.bathrooms || 0} baths</span>
           </div>
           <div className="flex items-center gap-1">
             <Maximize size={16} />
-            <span>{property.sqft.toLocaleString()} sqft</span>
+            <span>40 sqft</span>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
             <p className="text-3xl font-bold text-emerald-400">
-              ${(property.price / 1000000).toFixed(2)}M
+              ₹ {(property.price).toFixed(2)}
             </p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer">

@@ -9,7 +9,7 @@ const listingSchema = new Schema(
       street: { type: String, required: true },
       city: { type: String, required: true },
       state: { type: String, required: true },
-      pincode: { type: String, required: true },
+      pincode: { type: Number, required: true },
     },
     price: { type: Number, required: true },
     status: {
@@ -23,7 +23,7 @@ const listingSchema = new Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false, // changed for testing
     },
   },
   { timestamps: true },
