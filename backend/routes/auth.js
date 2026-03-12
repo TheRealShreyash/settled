@@ -10,7 +10,9 @@ auth.post("/register", async (req, res) => {
     const { name, email, password, role } = req.body;
 
     if (!name || !email || !password)
-      res.status(501).json({ message: "All fields required", success: false });
+      return res
+        .status(501)
+        .json({ message: "All fields required", success: false });
 
     const existingUser = await User.findOne({ email });
 
@@ -29,9 +31,9 @@ auth.post("/register", async (req, res) => {
       { expiresIn: "7d" },
     );
 
-    res.status(201).json({ token, success: true });
+    return res.status(201).json({ token, success: true });
   } catch (error) {
-    res.status(500).json({ message: error.message, success: false });
+    return res.status(500).json({ message: error.message, success: false });
   }
 });
 

@@ -29,3 +29,11 @@ export const authMiddleware = async (req, res, next) => {
       .json({ message: "Invalid or expired token.", success: false });
   }
 };
+
+export const requireAdmin = (req, res, next) => {
+  if (req.user?.role !== "admin")
+    return res
+      .status(403)
+      .json({ message: "Admin access only.", success: false });
+  next();
+};
