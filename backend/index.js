@@ -3,6 +3,8 @@ import cors from "cors";
 import { connectDb } from "./lib/connectDb.js";
 import listing from "./routes/listing.js";
 import auth from "./routes/auth.js";
+import visit from "./routes/visit.js";
+import lease from "./routes/lease.js";
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use(
 );
 app.use("/listing", listing);
 app.use("/auth", auth);
+app.use("/visit", visit);
+app.use("/lease", lease);
 const PORT = 8080;
 
 app.get("/", async (req, res) => {
