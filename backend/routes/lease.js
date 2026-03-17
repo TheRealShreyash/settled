@@ -40,4 +40,28 @@ lease.get("/leases", authMiddleware, async (req, res) => {
   }
 });
 
+lease.patch("/:id/documents", authMiddleware, async (req, res) => {
+  try {
+    const { agreementSigned, depositPaid } = req.body;
+
+    const updated = await Lease.findOneAndUpdate(
+      { _id: req.params.id, tenant: req.user.userId },
+      {
+        "documentsStatus.agreementSigned": agreementSigned,
+        "documentsStatus.depositPaid": depositPaid,
+      },
+      { new: true },
+    );
+
+    if (!updated)
+      return res
+        .status(404)
+        .json({ message: "Lease not found", success: false });
+
+    res.status(200).json({ data: updated, success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
+  }
+});
+
 export default lease;
