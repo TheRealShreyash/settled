@@ -64,4 +64,30 @@ lease.patch("/:id/documents", authMiddleware, async (req, res) => {
   }
 });
 
+lease.patch("/:id/inventory", requireAuth, async (req, res) => {
+  try {
+    // req.body.inventory = [{ item: "AC", isVerifiedByTenant: true }, ...]
+    const { inventory } = req.body;
+
+    const lease = await Lease.findOne({
+      _id: req.params.id,
+      tenant: req.user.userId,
+    });
+    if (!lease)
+      return res
+        .status(404)
+        .json({ message: "Lease not found", success: false });
+
+    inventory.forEach(({ item, isVerifiedByTenant }) => {
+      const found = lease.inventoryList.find((i) => i.item === item);
+      if (found) found.isVerifiedByTenant = isVerifiedByTenant;
+    });
+
+    await lease.save();
+    res.status(200).json({ data: lease, success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
+  }
+});
+
 export default lease;
